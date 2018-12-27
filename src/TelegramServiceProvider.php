@@ -15,7 +15,7 @@ class TelegramServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '../config/telegram.php' => config_path('telegram.php'),
+                __DIR__ . '/../config/telegram.php' => config_path('telegram.php'),
             ], 'config');
 
             $this->commands([
