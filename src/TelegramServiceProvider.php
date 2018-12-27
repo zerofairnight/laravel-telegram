@@ -3,7 +3,6 @@
 namespace Laravel\Telegram;
 
 use Illuminate\Support\ServiceProvider;
-use Laravel\Telegram\Console\Commands\TelegramWebhook;
 
 class TelegramServiceProvider extends ServiceProvider
 {
@@ -15,16 +14,14 @@ class TelegramServiceProvider extends ServiceProvider
     public function boot()
     {
         if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '../config/telegram.php' => config_path('telegram.php'),
+            ], 'config');
+
             $this->commands([
-                TelegramWebhook::class,
+                \Laravel\Telegram\Console\Commands\TelegramWebhook::class,
             ]);
         }
-
-        $this->publishes([
-            __DIR__.'../config/telegram.php' => config_path('telegram.php'),
-        ], 'config');
-
-        // $this->mergeConfigFrom(__DIR__.'../config/telegram.php', 'telegram');
     }
 
     /**
