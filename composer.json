@@ -1,5 +1,5 @@
 {
-    "name": "laravel/telegram",
+    "name": "zerofairnight/laravel-telegram",
     "description": "Telegram Bot for Laravel",
     "keywords": ["telegram", "laravel"],
     "license": "MIT",
