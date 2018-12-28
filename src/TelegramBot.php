@@ -18,6 +18,18 @@ class TelegramBot extends TelegramRequest
     }
 
     /**
+     * Undocumented function
+     *
+     * @return void
+     */
+    public function file($file)
+    {
+        $file = fopen($file, 'rb');
+
+        return new \Laravel\Telegram\Objects\InputFile($file);
+    }
+
+    /**
      * @link https://core.telegram.org/bots/api#getupdates
      */
     public function getUpdates()

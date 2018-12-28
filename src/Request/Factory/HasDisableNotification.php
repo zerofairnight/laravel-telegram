@@ -7,7 +7,7 @@ trait HasDisableNotification
     /**
      * Sends the message silently. Users will receive a notification with no sound.
      *
-     * @return \Laravel\Telegram\Request\SendMessage
+     * @return $this
      */
     public function disableNotification()
     {
@@ -20,7 +20,7 @@ trait HasDisableNotification
      * Sends the message silently. Users will receive a notification with no sound.
      * Alias to disableNotification()
      *
-     * @return \Laravel\Telegram\Request\SendMessage
+     * @return $this
      */
     public function silent()
     {

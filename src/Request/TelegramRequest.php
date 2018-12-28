@@ -17,6 +17,13 @@ class TelegramRequest
     const URL = 'https://api.telegram.org/bot';
 
     /**
+     * The telegram bot id.
+     *
+     * @var string
+     */
+    protected $id;
+
+    /**
      * The telegram API token.
      *
      * @var string
@@ -29,13 +36,6 @@ class TelegramRequest
      * @var string
      */
     protected $username;
-
-    /**
-     * The telegram bot id.
-     *
-     * @var string
-     */
-    protected $id;
 
     /**
      * Indicates if the request is asynchronous (non-blocking).
@@ -53,9 +53,11 @@ class TelegramRequest
      */
     public function __construct($token, $username = null, $async = false)
     {
+        // the first part of the telegram token is the bot id separated by a colon.
+        // $token = {id}:{key}
+        $this->id = explode(':', $token)[0];
         $this->token = $token;
         $this->username = $username;
-        $this->id = explode(':', $token)[0];
         $this->async = $async;
     }
 
@@ -74,8 +76,6 @@ class TelegramRequest
     /**
      * Get the full url of the  endpoint for the method.
      *
-     * @throws InvalidArgumentException if the token is missing
-     *
      * @return string
      */
     public function getEndpoint($method)
@@ -86,7 +86,7 @@ class TelegramRequest
     /**
      * Send the request.
      *
-     * @throws \InvalidArgumentException if the token is missing
+     * @throws \InvalidArgumentException if the token is missing.
      *
      * @return mixed Returns the response data.
      */
@@ -101,14 +101,22 @@ class TelegramRequest
         $client = new \GuzzleHttp\Client();
         $timeOut = 30;
         $connectTimeOut = 15;
+
         $options = [
             \GuzzleHttp\RequestOptions::TIMEOUT => $timeOut,
             \GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => $connectTimeOut,
             \GuzzleHttp\RequestOptions::SYNCHRONOUS => $this->async,
             \GuzzleHttp\RequestOptions::HTTP_ERRORS => false, // we handle errors by ourself!
             // \GuzzleHttp\RequestOptions::MULTIPART
-            \GuzzleHttp\RequestOptions::FORM_PARAMS => $params,
+            // \GuzzleHttp\RequestOptions::FORM_PARAMS => $params,
         ];
+
+        if ($this->isMultipartPayload($params)) {
+            $options[\GuzzleHttp\RequestOptions::MULTIPART] = $this->createMultipartPayload($params);
+        } else {
+            $options[\GuzzleHttp\RequestOptions::FORM_PARAMS] = $params;
+        }
+
 
         $response = $client->post($url, $options);
 
@@ -156,16 +164,34 @@ class TelegramRequest
         }
     }
 
-    protected function isMultipartPayload($params)
-    {
-        return count(array_filter($params, function ($param) {
-            return (is_resource($param) || $param instanceof \GuzzleHttp\Psr7\Stream);
-        }));
-    }
-
     protected function prepareRequest($params = [])
     {
         //
+    }
+
+    protected function isMultipartPayload($params)
+    {
+        return count(array_filter($params, function ($param) {
+            if ($param instanceof \Laravel\Telegram\Objects\InputFile) {
+                return $param->isStream();
+            }
+
+            return is_resource($param) || $param instanceof \GuzzleHttp\Psr7\Stream;
+        }));
+    }
+
+    protected function createMultipartPayload($params)
+    {
+        return array_map(function ($name, $contents) {
+            if ($contents instanceof \Laravel\Telegram\Objects\InputFile) {
+                return [
+                    'name' => $name,
+                    'contents' => $contents->open()
+                ];
+            }
+
+            return compact('name', 'contents');
+        }, array_keys($params), $params);
     }
 
     protected function parseResponse($data)

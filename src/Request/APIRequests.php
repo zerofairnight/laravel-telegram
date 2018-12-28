@@ -13,6 +13,7 @@ trait APIRequests
      * A simple method for testing your bot's auth token. Requires no parameters. Returns basic information about the bot in form of a User object.
      *
      * @link https://core.telegram.org/bots/api#getme
+     *
      * @return \Laravel\Telegram\Response\User
      */
     public function getMe()

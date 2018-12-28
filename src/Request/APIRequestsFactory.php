@@ -11,7 +11,7 @@ trait APIRequestsFactory
      *
      * @return \Laravel\Telegram\Request\Factory\SendMessage
      */
-    public function sendMessageRequest()
+    public function sendMessageQuery()
     {
         return new SendMessage($this);
     }

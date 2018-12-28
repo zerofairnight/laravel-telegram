@@ -8,7 +8,7 @@ trait HasChatId
      * Set the chat id to which send the message.
      *
      * @param  int|string  $chat_id
-     * @return \Laravel\Telegram\Request\SendMessage
+     * @return $this
      */
     public function chat($chat_id)
     {
@@ -22,7 +22,7 @@ trait HasChatId
      * Alias for chat()
      *
      * @param  string  $username
-     * @return \Laravel\Telegram\Request\SendMessage
+     * @return $this
      */
     public function channel($username)
     {
